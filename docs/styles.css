@@ -131,3 +131,13 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow: hid
 .modal-overlay.active { display: flex; }
 .modal-box { background: white; padding: 25px; border-radius: 10px; max-width: 400px; width: 90%; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 .modal-box.active { display: block; }
+
+/* Estilos de Formulario de Perfil Específicos */
+.profile-form {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    max-width: 500px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
