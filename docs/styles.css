@@ -114,6 +114,39 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow: hid
 .notification-item small { opacity: 0.8; }
 .drawer-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.2); z-index: 999; }
 .drawer-overlay.active { display: block; }
+/* ==================== ESTADOS DINÁMICOS TAREAS ==================== */
+
+.status-select{
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* SIN EMPEZAR */
+.status-gray{
+    background-color: #ececec;
+    color: #555;
+    border: 1px solid #bdbdbd;
+}
+
+/* EN PROGRESO */
+.status-yellow{
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffe082;
+}
+
+/* COMPLETADA */
+.status-green{
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #81c784;
+}
 
 /* ==================== MODALES ==================== */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1100; }
