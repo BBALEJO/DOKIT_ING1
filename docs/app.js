@@ -23,36 +23,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const btnLogout = document.getElementById('btn-logout');
 
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault(); 
-        const email = document.getElementById('login-email').value;
-        const pass = document.getElementById('login-pass').value;
-        
-        const users = JSON.parse(localStorage.getItem('users'));
-        const user = users.find(u => u.email === email && u.pass === pass);
-
-        if (user) {
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            document.getElementById('login-error').style.display = 'none';
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault(); 
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
             
-            applyRoleUI(); 
-            renderProjects(); 
-            
-            document.getElementById('login-view').classList.remove('active');
-            document.getElementById('dashboard-view').classList.add('active');
-        } else {
-            document.getElementById('login-error').style.display = 'block';
-        }
-    });
+            const users = JSON.parse(localStorage.getItem('users'));
+            const user = users.find(u => u.email === email && u.pass === pass);
 
-    btnLogout.addEventListener('click', (e) => {
-        e.preventDefault();
-        localStorage.removeItem('currentUser');
-        document.getElementById('dashboard-view').classList.remove('active');
-        document.getElementById('login-view').classList.add('active');
-        document.getElementById('login-form').reset();
-        switchView('proyectos', document.querySelector('.sidebar-nav li'));
-    });
+            if (user) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                document.getElementById('login-error').style.display = 'none';
+                
+                applyRoleUI(); 
+                renderProjects(); 
+                
+                document.getElementById('login-view').classList.remove('active');
+                document.getElementById('dashboard-view').classList.add('active');
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        });
+    }
+
+    if (btnLogout) {
+        btnLogout.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('currentUser');
+            document.getElementById('dashboard-view').classList.remove('active');
+            document.getElementById('login-view').classList.add('active');
+            document.getElementById('login-form').reset();
+            switchView('proyectos', document.querySelector('.sidebar-nav li'));
+        });
+    }
+    
+    // Si la sesión sigue activa al recargar
+    if (localStorage.getItem('currentUser')) {
+        applyRoleUI();
+        renderProjects();
+    }
 });
 
 function applyRoleUI() {
@@ -66,10 +76,10 @@ function applyRoleUI() {
     const actionButtons = document.querySelectorAll('.btn-action-lider');
 
     if (currentUser.role === 'Semillerista') {
-        navRegistrar.style.display = 'none';
+        if (navRegistrar) navRegistrar.style.display = 'none';
         actionButtons.forEach(btn => btn.style.display = 'none');
     } else {
-        navRegistrar.style.display = 'flex';
+        if (navRegistrar) navRegistrar.style.display = 'flex';
         actionButtons.forEach(btn => btn.style.display = 'inline-block');
     }
 }
@@ -77,9 +87,10 @@ function applyRoleUI() {
 // ==================== NAVEGACIÓN Y DRAWER ====================
 function switchView(viewName, element) {
     document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
-    document.getElementById('view-' + viewName).classList.add('active');
+    const targetView = document.getElementById('view-' + viewName);
+    if (targetView) targetView.classList.add('active');
 
-    if(element) {
+    if (element) {
         document.querySelectorAll('.sidebar-nav li').forEach(li => li.classList.remove('active'));
         element.classList.add('active');
     }
@@ -101,6 +112,8 @@ function toggleDrawer() {
 // ==================== CRUD PROYECTOS ====================
 function renderProjects() {
     const container = document.getElementById('projects-container');
+    if (!container) return;
+    
     const projects = JSON.parse(localStorage.getItem('projects')) || [];
     const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
     
@@ -108,12 +121,11 @@ function renderProjects() {
     
     projects.forEach(proj => {
         let actionButtons = '';
-        // Solo el LIDER ve los botones de eliminar y editar
         if (currentUser.role === 'Lider') {
             actionButtons = `
                 <div class="project-actions">
                     <button class="btn-icon text-red" onclick="promptDeleteProject(${proj.id})"><i class="fa-solid fa-trash"></i></button>
-                    <button class="btn-icon text-red"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn-icon text-red" onclick="promptEditProject(${proj.id})"><i class="fa-solid fa-pen"></i></button>
                 </div>
             `;
         }
@@ -141,10 +153,34 @@ function createProject() {
     if (!nameInput) return alert("Ingrese un nombre");
 
     const projects = JSON.parse(localStorage.getItem('projects')) || [];
-    projects.push({ id: Date.now(), name: nameInput, progress: 0, tasksStr: '0 Tareas' });
+    // Corregido a '0/0 Tareas' para mantener consistencia visual
+    projects.push({ id: Date.now(), name: nameInput, progress: 0, tasksStr: '0/0 Tareas' });
     
     localStorage.setItem('projects', JSON.stringify(projects));
     document.getElementById('new-project-name').value = '';
+    closeModal();
+    renderProjects();
+}
+
+function promptEditProject(id) {
+    const projects = JSON.parse(localStorage.getItem('projects')) || [];
+    const proj = projects.find(p => p.id === id);
+    if (!proj) return;
+
+    document.getElementById('edit-project-id').value = proj.id;
+    document.getElementById('edit-project-name').value = proj.name;
+    openModal('modal-editar');
+}
+
+function saveEditProject() {
+    const id = parseInt(document.getElementById('edit-project-id').value);
+    const updatedName = document.getElementById('edit-project-name').value;
+    if (!updatedName) return alert("El nombre no puede estar vacío");
+
+    let projects = JSON.parse(localStorage.getItem('projects')) || [];
+    projects = projects.map(p => p.id === id ? { ...p, name: updatedName } : p);
+
+    localStorage.setItem('projects', JSON.stringify(projects));
     closeModal();
     renderProjects();
 }
@@ -165,12 +201,19 @@ function confirmDeleteProject() {
 
 // ==================== MODALES ====================
 function openModal(modalId) {
-    document.getElementById('modal-overlay').classList.add('active');
-    document.querySelectorAll('.modal-box').forEach(m => m.classList.remove('active'));
-    document.getElementById(modalId).classList.add('active');
+    const overlay = document.getElementById('modal-overlay');
+    const modal = document.getElementById(modalId);
+    if (overlay && modal) {
+        overlay.classList.add('active');
+        document.querySelectorAll('.modal-box').forEach(m => m.classList.remove('active'));
+        modal.classList.add('active');
+    }
 }
 
 function closeModal() {
-    document.getElementById('modal-overlay').classList.remove('active');
-    document.querySelectorAll('.modal-box').forEach(m => m.classList.remove('active'));
+    const overlay = document.getElementById('modal-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+        document.querySelectorAll('.modal-box').forEach(m => m.classList.remove('active'));
+    }
 }
