@@ -159,10 +159,28 @@
 
             <div id="view-perfil" class="app-view">
                 <div class="content-header">
-                    <h2><i class="fa-regular fa-user-circle text-red"></i> Perfil</h2>
+                    <h2><i class="fa-regular fa-user-circle text-red"></i> Mi Perfil</h2>
                 </div>
-                <div class="profile-form mt-2">
-                    <button class="btn-primary" id="btn-logout">Cerrar sesión</button>
+                <div class="profile-card-container mt-2">
+                    <form id="profile-form" class="profile-form">
+                        <div class="form-group">
+                            <label>Nombre Completo</label>
+                            <input type="text" id="profile-name" required class="input-box">
+                        </div>
+                        <div class="form-group">
+                            <label>Correo Institucional</label>
+                            <input type="email" id="profile-email" required class="input-box" readonly style="background: #e9ecef; cursor: not-allowed;">
+                            <small class="text-small">El correo institucional no puede modificarse.</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Nueva Contraseña</label>
+                            <input type="password" id="profile-pass" required class="input-box" placeholder="Ingresa tu nueva contraseña">
+                        </div>
+                        <div class="flex-center mt-2" style="gap: 15px; justify-content: flex-start;">
+                            <button type="submit" class="btn-primary">Guardar Cambios</button>
+                            <button type="button" class="btn-outline" id="btn-logout">Cerrar sesión</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -200,7 +218,7 @@
             <hr class="white-line">
             <div class="text-center mt-1"><small>Ayer</small></div>
             <div class="notification-item mt-1">
-                <p>Se modificó el estado de la tarea por un Administrador</p>
+                <p>Se modificó el estado de la tarea por un Administrator</p>
                 <small>17/05/26 8:30am</small>
             </div>
         </div>
