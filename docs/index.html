@@ -4,192 +4,647 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dock-it App</title>
-    <!-- Asegúrate de que tu archivo CSS se llame exactamente styles.css -->
+
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 
-    <!-- ==================== PANTALLA DE LOGIN ==================== -->
+    <!-- ==================== LOGIN ==================== -->
     <div id="login-view" class="view-container active">
+
         <div class="login-wrapper">
-            <h1 class="text-center text-red mt-2">Bienvenido a Dock-it</h1>
-            
+
+            <h1 class="text-center text-red mt-2">
+                Bienvenido a Dock-it
+            </h1>
+
             <div class="login-content">
+
                 <div class="login-text-card">
+
                     <h3>¡Organiza tu equipo!</h3>
-                    <p>Inicia sesión como <strong>Semillerista</strong> o <strong>Líder</strong> y comienza a gestionar tus proyectos de manera eficiente.</p>
+
+                    <p>
+                        Inicia sesión como
+                        <strong>Semillerista</strong>
+                        o
+                        <strong>Líder</strong>
+                        y comienza a gestionar tus proyectos.
+                    </p>
+
                     <div class="test-credentials">
-                        <small><b>Prueba Lider:</b> lider@unilibre.edu.co / 123</small><br>
-                        <small><b>Prueba Semi:</b> semi@unilibre.edu.co / 123</small>
+
+                        <small>
+                            <b>Prueba Lider:</b>
+                            lider@unilibre.edu.co / 123
+                        </small>
+
+                        <br>
+
+                        <small>
+                            <b>Prueba Semi:</b>
+                            semi@unilibre.edu.co / 123
+                        </small>
+
                     </div>
                 </div>
-                
+
+                <!-- FORM LOGIN -->
                 <form id="login-form" class="login-form">
+
                     <div class="form-group">
                         <label>Correo electrónico</label>
-                        <input type="email" id="login-email" required placeholder="lider@unilibre.edu.co">
+
+                        <input
+                            type="email"
+                            id="login-email"
+                            required
+                            placeholder="lider@unilibre.edu.co">
                     </div>
+
                     <div class="form-group">
                         <label>Contraseña</label>
-                        <input type="password" id="login-pass" required placeholder="123">
+
+                        <input
+                            type="password"
+                            id="login-pass"
+                            required
+                            placeholder="123">
                     </div>
-                    <p id="login-error" class="text-red text-small" style="display: none; margin-bottom:10px;">Credenciales incorrectas</p>
-                    <button type="submit" class="btn-primary">Iniciar sesión</button>
+
+                    <p
+                        id="login-error"
+                        class="text-red text-small"
+                        style="display:none; margin-bottom:10px;">
+
+                        Credenciales incorrectas
+                    </p>
+
+                    <button type="submit" class="btn-primary">
+                        Iniciar sesión
+                    </button>
+
                 </form>
+
             </div>
         </div>
     </div>
 
     <!-- ==================== DASHBOARD ==================== -->
     <div id="dashboard-view" class="view-container">
-        
-        <!-- Menú Lateral -->
+
+        <!-- SIDEBAR -->
         <aside class="sidebar">
+
             <div class="sidebar-header">
                 <h3 id="ui-user-name">Usuario</h3>
                 <p id="ui-user-role">Rol</p>
             </div>
+
             <nav class="sidebar-nav">
+
                 <ul>
-                    <li class="active" onclick="switchView('proyectos', this)"><a href="#"><i class="fa-regular fa-folder"></i> Tus proyectos</a></li>
-                    <li onclick="switchView('tareas', this)"><a href="#"><i class="fa-solid fa-check-square"></i> Tareas</a></li>
-                    <li onclick="toggleDrawer()"><a href="#"><i class="fa-solid fa-inbox"></i> Bandeja de entrada</a></li>
-                    <li onclick="switchView('sprints', this)"><a href="#"><i class="fa-regular fa-calendar-days"></i> Sprint</a></li>
-                    <li id="nav-registrar" onclick="switchView('registrar', this)"><a href="#"><i class="fa-solid fa-user-plus"></i> Registrar</a></li>
+
+                    <li class="active"
+                    onclick="switchView('proyectos', this)">
+
+                        <a href="#">
+                            <i class="fa-regular fa-folder"></i>
+                            Tus proyectos
+                        </a>
+
+                    </li>
+
+                    <li onclick="switchView('tareas', this)">
+
+                        <a href="#">
+                            <i class="fa-solid fa-check-square"></i>
+                            Tareas
+                        </a>
+
+                    </li>
+
+                    <li onclick="toggleDrawer()">
+
+                        <a href="#">
+                            <i class="fa-solid fa-inbox"></i>
+                            Bandeja de entrada
+                        </a>
+
+                    </li>
+
+                    <li onclick="switchView('sprints', this)">
+
+                        <a href="#">
+                            <i class="fa-regular fa-calendar-days"></i>
+                            Sprint
+                        </a>
+
+                    </li>
+
+                    <li id="nav-registrar"
+                    onclick="switchView('registrar', this)">
+
+                        <a href="#">
+                            <i class="fa-solid fa-user-plus"></i>
+                            Registrar
+                        </a>
+
+                    </li>
+
                 </ul>
+
             </nav>
+
             <div class="sidebar-footer">
-                <a href="#" onclick="switchView('perfil', this)"><i class="fa-regular fa-user-circle"></i> Perfil</a>
+
+                <a href="#"
+                onclick="switchView('perfil', this)">
+
+                    <i class="fa-regular fa-user-circle"></i>
+                    Perfil
+
+                </a>
+
             </div>
+
         </aside>
 
-        <!-- Contenido Principal -->
+        <!-- MAIN -->
         <main class="main-content">
-            
-            <!-- VISTA: PROYECTOS -->
+
+            <!-- ==================== PROYECTOS ==================== -->
             <div id="view-proyectos" class="app-view active">
+
                 <div class="content-header flex-between">
-                    <h2><i class="fa-regular fa-folder text-red"></i> Proyectos</h2>
-                    <button class="btn-primary btn-action-lider" onclick="openModal('modal-crear')">Gestionar Proyectos</button>
-                </div>
-                
-                <div id="projects-container" class="projects-grid">
-                    <!-- JS inyectará los proyectos aquí -->
+
+                    <h2>
+                        <i class="fa-regular fa-folder text-red"></i>
+                        Proyectos
+                    </h2>
+
+                    <button
+                    class="btn-primary btn-action-lider"
+                    onclick="openModal('modal-crear')">
+
+                        Gestionar Proyectos
+
+                    </button>
+
                 </div>
 
-                <button class="btn-text mt-2 btn-action-lider" onclick="openModal('modal-crear')">+ Crear Proyecto</button>
+                <div id="projects-container"
+                class="projects-grid">
+
+                </div>
+
+                <button
+                class="btn-text mt-2 btn-action-lider"
+                onclick="openModal('modal-crear')">
+
+                    + Crear Proyecto
+
+                </button>
+
             </div>
 
-            <!-- VISTA: TAREAS -->
+            <!-- ==================== TAREAS ==================== -->
             <div id="view-tareas" class="app-view">
+
                 <div class="content-header">
-                    <h2><i class="fa-solid fa-check-square text-red"></i> Tareas</h2>
+
+                    <h2>
+                        <i class="fa-solid fa-check-square text-red"></i>
+                        Tareas
+                    </h2>
+
                 </div>
+
                 <div class="table-container">
+
                     <table class="red-table">
+
                         <thead>
-                            <tr><th>ID</th><th>Nombre de la tarea</th><th>Sprint</th><th>Estado</th><th>Prioridad</th><th>Responsable</th></tr>
+
+                            <tr>
+
+                                <th>ID</th>
+                                <th>Nombre de la tarea</th>
+                                <th>Sprint</th>
+                                <th>Estado</th>
+                                <th>Prioridad</th>
+                                <th>Responsable</th>
+
+                            </tr>
+
                         </thead>
+
                         <tbody>
-                            <tr><td>1</td><td>Lorem ipsum</td><td>Sprint 1</td><td><span class="badge gray">Sin empezar</span></td><td><span class="badge red">Alta</span></td><td>Fulanito</td></tr>
+
+                            <!-- TAREA 1 -->
+                            <tr>
+
+                                <td>1</td>
+
+                                <td>Lorem ipsum</td>
+
+                                <td>Sprint 1</td>
+
+                                <td>
+
+                                    <select
+                                    class="status-select status-gray"
+                                    onchange="changeStatus(this)">
+
+                                        <option value="sin-empezar">
+                                            Sin empezar
+                                        </option>
+
+                                        <option value="progreso">
+                                            En progreso
+                                        </option>
+
+                                        <option value="completada">
+                                            Completada
+                                        </option>
+
+                                    </select>
+
+                                </td>
+
+                                <td>
+                                    <span class="badge red">
+                                        Alta
+                                    </span>
+                                </td>
+
+                                <td>Fulanito</td>
+
+                            </tr>
+
+                            <!-- TAREA 2 -->
+                            <tr>
+
+                                <td>2</td>
+
+                                <td>Diseñar dashboard</td>
+
+                                <td>Sprint 1</td>
+
+                                <td>
+
+                                    <select
+                                    class="status-select status-yellow"
+                                    onchange="changeStatus(this)">
+
+                                        <option value="sin-empezar">
+                                            Sin empezar
+                                        </option>
+
+                                        <option
+                                        value="progreso"
+                                        selected>
+
+                                            En progreso
+
+                                        </option>
+
+                                        <option value="completada">
+                                            Completada
+                                        </option>
+
+                                    </select>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="badge gray">
+                                        Media
+                                    </span>
+
+                                </td>
+
+                                <td>María</td>
+
+                            </tr>
+
+                            <!-- TAREA 3 -->
+                            <tr>
+
+                                <td>3</td>
+
+                                <td>Conectar base de datos</td>
+
+                                <td>Sprint 2</td>
+
+                                <td>
+
+                                    <select
+                                    class="status-select status-green"
+                                    onchange="changeStatus(this)">
+
+                                        <option value="sin-empezar">
+                                            Sin empezar
+                                        </option>
+
+                                        <option value="progreso">
+                                            En progreso
+                                        </option>
+
+                                        <option
+                                        value="completada"
+                                        selected>
+
+                                            Completada
+
+                                        </option>
+
+                                    </select>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="badge red">
+                                        Alta
+                                    </span>
+
+                                </td>
+
+                                <td>Carlos</td>
+
+                            </tr>
+
                         </tbody>
+
                     </table>
+
                 </div>
+
             </div>
 
-            <!-- VISTA: SPRINTS -->
+            <!-- ==================== SPRINT ==================== -->
             <div id="view-sprints" class="app-view">
+
                 <div class="content-header">
-                    <h2><i class="fa-regular fa-calendar-days text-red"></i> Sprint</h2>
+
+                    <h2>
+                        <i class="fa-regular fa-calendar-days text-red"></i>
+                        Sprint
+                    </h2>
+
                 </div>
+
                 <table class="red-table">
-                    <thead><tr><th>Nombre</th><th>Fechas</th><th>Total tareas</th><th>Completadas</th><th>Estado</th></tr></thead>
+
+                    <thead>
+
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Fechas</th>
+                            <th>Total tareas</th>
+                            <th>Completadas</th>
+                            <th>Estado</th>
+                        </tr>
+
+                    </thead>
+
                     <tbody>
-                        <tr><td>Sprint 1</td><td>01/01/26-15/01/26</td><td>10</td><td>90%</td><td>Actual</td></tr>
+
+                        <tr>
+
+                            <td>Sprint 1</td>
+                            <td>01/01/26 - 15/01/26</td>
+                            <td>10</td>
+                            <td>90%</td>
+                            <td>Actual</td>
+
+                        </tr>
+
                     </tbody>
+
                 </table>
+
             </div>
 
-            <!-- VISTA: PERFIL -->
+            <!-- ==================== PERFIL ==================== -->
             <div id="view-perfil" class="app-view">
+
                 <div class="content-header">
-                    <h2><i class="fa-regular fa-user-circle text-red"></i> Perfil</h2>
+
+                    <h2>
+                        <i class="fa-regular fa-user-circle text-red"></i>
+                        Perfil
+                    </h2>
+
                 </div>
+
                 <div class="profile-form mt-2">
-                    <button class="btn-primary" id="btn-logout">Cerrar sesión</button>
+
+                    <button class="btn-primary"
+                    id="btn-logout">
+
+                        Cerrar sesión
+
+                    </button>
+
                 </div>
+
             </div>
 
-            <!-- VISTA: REGISTRAR -->
+            <!-- ==================== REGISTRAR ==================== -->
             <div id="view-registrar" class="app-view">
+
                 <div class="content-header">
-                    <h2><i class="fa-solid fa-user-plus text-red"></i> Registrar Nuevo Usuario</h2>
+
+                    <h2>
+                        <i class="fa-solid fa-user-plus text-red"></i>
+                        Registrar Nuevo Usuario
+                    </h2>
+
                 </div>
+
                 <form class="register-form mt-2">
-                    <input type="text" placeholder="Nombre" class="input-line">
-                    <input type="email" placeholder="Correo institucional" class="input-line">
-                    <button type="button" class="btn-primary mt-2">Finalizar registro</button>
+
+                    <input
+                    type="text"
+                    placeholder="Nombre"
+                    class="input-line">
+
+                    <input
+                    type="email"
+                    placeholder="Correo institucional"
+                    class="input-line">
+
+                    <button
+                    type="button"
+                    class="btn-primary mt-2">
+
+                        Finalizar registro
+
+                    </button>
+
                 </form>
+
             </div>
 
         </main>
+
     </div>
 
-    <!-- ==================== DRAWER (BANDEJA DE ENTRADA) ==================== -->
+    <!-- ==================== DRAWER ==================== -->
     <div id="notification-drawer" class="drawer">
+
         <div class="drawer-header">
+
             <div class="drawer-icons">
+
                 <i class="fa-regular fa-folder"></i>
                 <i class="fa-solid fa-check-square"></i>
                 <i class="fa-solid fa-image"></i>
                 <i class="fa-regular fa-calendar-days"></i>
+
             </div>
-            <button class="btn-icon text-white" onclick="toggleDrawer()"><i class="fa-solid fa-xmark"></i></button>
+
+            <button
+            class="btn-icon text-white"
+            onclick="toggleDrawer()">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
         </div>
+
         <hr class="white-line">
+
         <div class="drawer-content">
+
             <div class="notification-item">
-                <p>Fuiste agregado al proyecto "Nombre Proyecto"</p>
+
+                <p>
+                    Fuiste agregado al proyecto
+                    "Nombre Proyecto"
+                </p>
+
                 <small>18/04/26 6:15pm</small>
+
             </div>
+
             <hr class="white-line">
-            <div class="text-center mt-1"><small>Ayer</small></div>
-            <div class="notification-item mt-1">
-                <p>Fuiste eliminado del proyecto "Nombre Proyecto"</p>
-                <small>18/03/26 8:30am</small>
+
+            <div class="text-center mt-1">
+                <small>Ayer</small>
             </div>
+
+            <div class="notification-item mt-1">
+
+                <p>
+                    Fuiste eliminado del proyecto
+                    "Nombre Proyecto"
+                </p>
+
+                <small>18/03/26 8:30am</small>
+
+            </div>
+
         </div>
+
     </div>
-    <div id="drawer-overlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
+
+    <div id="drawer-overlay"
+    class="drawer-overlay"
+    onclick="toggleDrawer()">
+
+    </div>
 
     <!-- ==================== MODALES ==================== -->
-    <div id="modal-overlay" class="modal-overlay">
-        
-        <!-- Modal: Crear Proyecto -->
-        <div id="modal-crear" class="modal-box text-center">
-            <h3 class="text-red">Crear Proyecto</h3>
-            <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Img" style="width:100px; margin: 10px auto; border-radius: 5px;">
-            <input type="text" id="new-project-name" placeholder="Nombre proyecto" class="input-box">
-            <input type="text" id="new-project-members" placeholder="Miembros (ej. Equipo A)" class="input-box">
-            <div class="mt-2 flex-center" style="gap: 10px;">
-                <button class="btn-primary" onclick="createProject()">Guardar Cambios</button>
-                <button class="btn-outline" onclick="closeModal()">Cancelar</button>
+    <div id="modal-overlay"
+    class="modal-overlay">
+
+        <!-- MODAL CREAR -->
+        <div id="modal-crear"
+        class="modal-box text-center">
+
+            <h3 class="text-red">
+                Crear Proyecto
+            </h3>
+
+            <img
+            src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
+            alt="Img"
+            style="width:100px; margin:10px auto; border-radius:5px;">
+
+            <input
+            type="text"
+            id="new-project-name"
+            placeholder="Nombre proyecto"
+            class="input-box">
+
+            <input
+            type="text"
+            id="new-project-members"
+            placeholder="Miembros"
+            class="input-box">
+
+            <div class="mt-2 flex-center"
+            style="gap:10px;">
+
+                <button
+                class="btn-primary"
+                onclick="createProject()">
+
+                    Guardar Cambios
+
+                </button>
+
+                <button
+                class="btn-outline"
+                onclick="closeModal()">
+
+                    Cancelar
+
+                </button>
+
             </div>
+
         </div>
 
-        <!-- Modal: Eliminar Proyecto -->
-        <div id="modal-eliminar" class="modal-box text-center">
-            <h3 class="text-red">Eliminar</h3>
-            <p>¿Está seguro en eliminar el proyecto?<br>Esta acción no se puede reversar.</p>
-            <input type="hidden" id="delete-project-id">
-            <div class="mt-2 flex-center" style="gap: 10px;">
-                <button class="btn-primary" onclick="confirmDeleteProject()">Eliminar</button>
-                <button class="btn-outline" onclick="closeModal()">Cancelar</button>
-            </div>
-        </div>
     </div>
 
+    <!-- ==================== SCRIPT ==================== -->
+    <script>
+
+        function changeStatus(select){
+
+            select.classList.remove(
+                "status-gray",
+                "status-yellow",
+                "status-green"
+            );
+
+            if(select.value === "sin-empezar"){
+
+                select.classList.add("status-gray");
+
+            }else if(select.value === "progreso"){
+
+                select.classList.add("status-yellow");
+
+            }else if(select.value === "completada"){
+
+                select.classList.add("status-green");
+            }
+        }
+
+    </script>
+
     <script src="app.js"></script>
+
 </body>
 </html>
