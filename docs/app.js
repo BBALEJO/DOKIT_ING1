@@ -2,7 +2,7 @@ let currentSelectedProjectId = null;
 
 // ==================== BASE DE DATOS ESTRUCTURAL INICIAL ====================
 function initDB() {
-    // REPARADO: Volvieron los usuarios de prueba con sus roles correspondientes
+    // Restaurados los tres roles de prueba iniciales
     if (!localStorage.getItem('users')) {
         const defaultUsers = [
             { email: 'lider@unilibre.edu.co', pass: '123', role: 'Lider', name: 'Prof. Lider Principal', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80' },
@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = document.getElementById('login-email').value.trim();
             const pass = document.getElementById('login-pass').value;
             
-            // CORREGIDO: Ahora busca dinámicamente en el localStorage actualizado (acepta nuevos usuarios)
             const users = JSON.parse(localStorage.getItem('users')) || [];
             const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.pass === pass);
 
@@ -126,7 +125,9 @@ function applyRoleUI() {
     document.getElementById('ui-user-avatar').src = userAvatar;
 
     const actionLiderElements = document.querySelectorAll('.btn-action-lider');
-    if (currentUser.role === 'Lider') {
+    
+    // PERMISOS DE GESTIÓN: Tanto el Líder como el Profesor acceden a la creación y asignación
+    if (currentUser.role === 'Lider' || currentUser.role === 'Profesor') {
         actionLiderElements.forEach(el => el.style.display = 'block');
         const btnProj = document.querySelector('.content-header .btn-action-lider');
         if(btnProj) btnProj.style.display = 'inline-block';
@@ -182,7 +183,7 @@ function renderTimeline() {
     });
 }
 
-// ==================== GESTIÓN DE PERFILES DIARIOS COMPLEJOS ====================
+// ==================== GESTIÓN DE PERFILES ====================
 function loadProfileAdvanced() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) return;
@@ -223,7 +224,7 @@ function saveProfileAdvanced() {
     alert("¡Su perfil diario ha sido complejizado y actualizado correctamente!");
 }
 
-// ==================== LÍDER: CREACIÓN MANUAL DE USUARIOS ====================
+// ==================== REGISTRO MANUAL DE USUARIOS ====================
 function renderUsersTable() {
     const tbody = document.getElementById('users-table-body');
     if (!tbody) return;
@@ -240,7 +241,7 @@ function renderUsersTable() {
                     </div>
                 </td>
                 <td>${u.email}</td>
-                <td><span class="badge ${u.role === 'Lider'?'red':'gray'}">${u.role}</span></td>
+                <td><span class="badge ${u.role === 'Lider'?'red': u.role === 'Profesor' ? 'blue' : 'gray'}">${u.role}</span></td>
             </tr>
         `;
     });
@@ -260,7 +261,6 @@ function createNewUserByLider() {
         return alert("Error: El correo electrónico ya se encuentra registrado.");
     }
 
-    // Inserción limpia en base de datos local
     users.push({
         name: name,
         email: email,
@@ -271,15 +271,12 @@ function createNewUserByLider() {
 
     localStorage.setItem('users', JSON.stringify(users));
     
-    // Resetear formulario interno
     document.getElementById('user-new-name').value = '';
     document.getElementById('user-new-email').value = '';
     document.getElementById('user-new-pass').value = '';
 
     closeModal();
-    
-    // CORREGIDO: Forzar recarga completa de todos los componentes visuales del sistema
-    dashboardStartup();
+    dashboardStartup(); // Renderizado inmediato visual
     
     alert(`Usuario "${name}" registrado con éxito. Ya puede iniciar sesión con este correo.`);
 }
@@ -303,7 +300,7 @@ function toggleDrawer() {
     overlay.classList.toggle('active');
 }
 
-// ==================== PROYECTOS Y PANEL DE EXPANSIÓN INTERACTIVO ====================
+// ==================== PROYECTOS Y BITÁCORA PROTEGIDA ====================
 function renderProjects() {
     const container = document.getElementById('projects-container');
     if (!container) return;
@@ -315,7 +312,7 @@ function renderProjects() {
     
     projects.forEach(proj => {
         let actionButtons = '';
-        if (currentUser.role === 'Lider') {
+        if (currentUser.role === 'Lider' || currentUser.role === 'Profesor') {
             actionButtons = `
                 <div class="project-actions" onclick="event.stopPropagation();">
                     <button class="btn-icon text-red" onclick="promptDeleteProject(${proj.id})"><i class="fa-solid fa-trash"></i></button>
@@ -365,7 +362,7 @@ function createProject() {
     
     localStorage.setItem('projects', JSON.stringify(projects));
     
-    pushTimelineLog(nameInput, 'Inicialización de Proyecto', `El Líder del semillero creó el proyecto fijando fechas de control: ${startInput} hasta ${endInput}.`, '');
+    pushTimelineLog(nameInput, 'Inicialización de Proyecto', `Proyecto fijado estructuralmente desde: ${startInput} hasta ${endInput}.`, '');
 
     document.getElementById('new-project-name').value = '';
     closeModal();
@@ -409,10 +406,13 @@ function confirmDeleteProject() {
     let projects = JSON.parse(localStorage.getItem('projects')) || [];
     const proj = projects.find(p => p.id === id);
 
-    projects = projects.map(p => p.id === id ? { ...p, status: 'Eliminado' } : p);
+    projects = projects.map(p => {
+        if(p.id === id) return { ...p, status: 'Eliminado' };
+        return p;
+    });
     localStorage.setItem('projects', JSON.stringify(projects));
     
-    pushTimelineLog(proj.name, 'Cambio de Estado Externo', 'El Líder archivó de manera lógica el proyecto pasando su estado global a Eliminado.', '');
+    pushTimelineLog(proj.name, 'Cambio de Estado Externo', 'El proyecto se archivó de manera lógica pasando su estado a Eliminado.', '');
 
     closeModal();
     dashboardStartup();
@@ -426,6 +426,7 @@ function expandProjectDetails(id) {
     if (!proj) return;
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+    const projectMembers = proj.members || [];
 
     document.getElementById('detail-project-name').innerText = proj.name;
     document.getElementById('detail-project-status').innerText = proj.status;
@@ -433,9 +434,9 @@ function expandProjectDetails(id) {
 
     const membersList = document.getElementById('detail-members-list');
     membersList.innerHTML = '';
-    if(proj.members) {
-        proj.members.forEach(m => { membersList.innerHTML += `<li><i class="fa-regular fa-envelope text-red"></i> ${m}</li>`; });
-    }
+    projectMembers.forEach(m => { 
+        membersList.innerHTML += `<li><i class="fa-regular fa-envelope text-red"></i> ${m}</li>`; 
+    });
 
     const photosContainer = document.getElementById('detail-photos-container');
     photosContainer.innerHTML = '';
@@ -450,17 +451,31 @@ function expandProjectDetails(id) {
     const commentsContainer = document.getElementById('detail-comments-container');
     commentsContainer.innerHTML = '';
     if (proj.comments && proj.comments.length > 0) {
-        proj.comments.forEach(c => { commentsContainer.innerHTML += `<p style="font-size:0.85rem; margin-bottom:4px;"><b>${c.user}:</b> ${c.text}</p>`; });
+        proj.comments.forEach(c => { 
+            commentsContainer.innerHTML += `<p style="font-size:0.85rem; margin-bottom:4px;"><b>${c.user}:</b> ${c.text}</p>`; 
+        });
     } else {
         commentsContainer.innerHTML = '<small class="text-gray">Sin anotaciones de diario.</small>';
     }
 
+    // CONTROL DE ASIGNACIÓN: El Profesor y el Líder manejan la sección para añadir miembros
     const memberActionsDiv = document.querySelector('.btn-action-add-member');
-    if (currentUser.role !== 'Lider') {
-        if(memberActionsDiv) memberActionsDiv.style.display = 'none';
-    } else {
-        if(memberActionsDiv) memberActionsDiv.style.display = 'block';
+    if (memberActionsDiv) {
+        if (currentUser.role === 'Lider' || currentUser.role === 'Profesor') {
+            memberActionsDiv.style.display = 'block';
+        } else {
+            memberActionsDiv.style.display = 'none';
+        }
     }
+
+    // VALIDACIÓN VISUAL DE BITÁCORA: Oculta los inputs si el correo no está asignado
+    const photoFormContainer = document.getElementById('photo-upload-container-box');
+    const commentFormContainer = document.getElementById('comment-add-container-box');
+
+    const isAssignedMember = projectMembers.some(email => email.toLowerCase() === currentUser.email.toLowerCase());
+
+    if (photoFormContainer) photoFormContainer.style.display = isAssignedMember ? 'block' : 'none';
+    if (commentFormContainer) commentFormContainer.style.display = isAssignedMember ? 'block' : 'none';
 
     document.getElementById('project-details-panel').style.display = 'block';
     document.getElementById('project-details-panel').scrollIntoView({ behavior: 'smooth' });
@@ -476,7 +491,7 @@ function updateProjectStatusState() {
     projects = projects.map(p => p.id === currentSelectedProjectId ? { ...p, status: selectedState } : p);
     localStorage.setItem('projects', JSON.stringify(projects));
     
-    pushTimelineLog(proj.name, 'Transición de Estado del Ciclo', `Se alteró manualmente el estado interno del proyecto hacia: "${selectedState}".`, '');
+    pushTimelineLog(proj.name, 'Transición de Estado', `Se alteró el estado interno hacia: "${selectedState}".`, '');
 
     renderProjects();
     expandProjectDetails(currentSelectedProjectId);
@@ -484,8 +499,8 @@ function updateProjectStatusState() {
 
 function addMemberToProject() {
     if (!currentSelectedProjectId) return;
-    const emailInput = document.getElementById('add-member-email').value;
-    if (!emailInput) return alert("Ingrese un correo.");
+    const emailInput = document.getElementById('add-member-email').value.trim();
+    if (!emailInput) return alert("Ingrese un correo electrónico válido.");
 
     let projects = JSON.parse(localStorage.getItem('projects')) || [];
     let targetProj = projects.find(p => p.id === currentSelectedProjectId);
@@ -501,7 +516,7 @@ function addMemberToProject() {
 
     localStorage.setItem('projects', JSON.stringify(projects));
     
-    pushTimelineLog(targetProj.name, 'Asignación de Personal', `Se vinculó un nuevo participante institucional (${emailInput}) al proyecto.`, '');
+    pushTimelineLog(targetProj.name, 'Asignación de Personal', `Se vinculó a (${emailInput}) al equipo del proyecto.`, '');
 
     document.getElementById('add-member-email').value = '';
     expandProjectDetails(currentSelectedProjectId);
@@ -512,8 +527,18 @@ function uploadProjectPhoto() {
     const url = document.getElementById('project-photo-url').value;
     if (!url) return alert("Inserte una URL.");
 
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
     let projects = JSON.parse(localStorage.getItem('projects')) || [];
     let targetProj = projects.find(p => p.id === currentSelectedProjectId);
+    if (!targetProj) return;
+
+    // VALIDACIÓN ESTRICTA BACKEND LOCAL: Mapeo de correo participante
+    const projectMembers = targetProj.members || [];
+    const isAuthorized = projectMembers.some(email => email.toLowerCase() === currentUser.email.toLowerCase());
+
+    if (!isAuthorized) {
+        return alert("Acceso denegado: Solo los usuarios asignados formalmente a este proyecto pueden aportar evidencias multimedia.");
+    }
 
     projects = projects.map(p => {
         if (p.id === currentSelectedProjectId) {
@@ -526,7 +551,7 @@ function uploadProjectPhoto() {
 
     localStorage.setItem('projects', JSON.stringify(projects));
     
-    pushTimelineLog(targetProj.name, 'Carga de Evidencia Multimedia', 'Se subió una nueva fotografía representativa al diario de evolución tecnológica del proyecto.', url);
+    pushTimelineLog(targetProj.name, 'Carga de Evidencia Multimedia', `Fotografía de evolución añadida por ${currentUser.name}.`, url);
 
     document.getElementById('project-photo-url').value = '';
     expandProjectDetails(currentSelectedProjectId);
@@ -538,8 +563,18 @@ function addProjectComment() {
     const commentText = document.getElementById('project-comment-text').value;
     if (!commentText) return;
 
-    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || { name: 'Anónimo' };
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || { name: 'Anónimo', email: '' };
     let projects = JSON.parse(localStorage.getItem('projects')) || [];
+    let targetProj = projects.find(p => p.id === currentSelectedProjectId);
+    if (!targetProj) return;
+
+    // VALIDACIÓN ESTRICTA BACKEND LOCAL: Mapeo de correo participante
+    const projectMembers = targetProj.members || [];
+    const isAuthorized = projectMembers.some(email => email.toLowerCase() === currentUser.email.toLowerCase());
+
+    if (!isAuthorized) {
+        return alert("Acceso denegado: Tu usuario debe ser miembro del proyecto para realizar anotaciones en la bitácora.");
+    }
     
     projects = projects.map(p => {
         if (p.id === currentSelectedProjectId) {
@@ -555,7 +590,7 @@ function addProjectComment() {
     expandProjectDetails(currentSelectedProjectId);
 }
 
-// ==================== AUTO CONTROL DE SPRINTS SEMESTRALES ====================
+// ==================== REPORTE CONTROL DE SPRINTS ====================
 function renderSprintsTable() {
     const tbody = document.getElementById('sprints-table-body');
     if (!tbody) return;
@@ -584,7 +619,7 @@ function renderSprintsTable() {
     });
 }
 
-// ==================== SECCIÓN DE TAREAS ====================
+// ==================== TAREAS ====================
 function populateProjectSelects() {
     const filterSelect = document.getElementById('filter-task-project');
     const modalSelect = document.getElementById('task-project-select');
@@ -672,7 +707,7 @@ function createNewTaskData() {
     renderTasks();
 }
 
-// ==================== DISPARADORES MODAL OVERLAY ====================
+// ==================== DISPARADORES MODALES ====================
 function openModal(modalId) {
     const overlay = document.getElementById('modal-overlay');
     const modal = document.getElementById(modalId);
