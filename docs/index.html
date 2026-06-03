@@ -14,12 +14,12 @@
             <h1 class="text-center text-red mt-2">Bienvenido a Dock-it</h1>
             <div class="login-content">
                 <div class="login-text-card">
-                    <h3>¡Organiza tu equipo!</h3>
-                    <p>Inicia sesión como <strong>Semillerista</strong> o <strong>Líder</strong> y comienza a gestionar tus proyectos.</p>
+                    <h3>¡Organiza tu equipo de investigación!</h3>
+                    <p>Inicia sesión con tus credenciales institucionales y comienza a gestionar tus proyectos.</p>
                     <div class="test-credentials">
-                        <small><b>Prueba Lider:</b> lider@unilibre.edu.co / 123</small>
-                        <br>
-                        <small><b>Prueba Semi:</b> semi@unilibre.edu.co / 123</small>
+                        <small><b>Prueba Líder:</b> lider@unilibre.edu.co / 123</small><br>
+                        <small><b>Prueba Profesor:</b> profe@unilibre.edu.co / 123</small><br>
+                        <small><b>Prueba Semillerista:</b> semi@unilibre.edu.co / 123</small>
                     </div>
                 </div>
 
@@ -59,10 +59,7 @@
                         <a href="#"><i class="fa-solid fa-inbox"></i> Bandeja de entrada</a>
                     </li>
                     <li onclick="switchView('sprints', this)">
-                        <a href="#"><i class="fa-regular fa-calendar-days"></i> Sprint</a>
-                    </li>
-                    <li id="nav-registrar" onclick="switchView('registrar', this)">
-                        <a href="#"><i class="fa-solid fa-user-plus"></i> Registrar</a>
+                        <a href="#"><i class="fa-regular fa-calendar-days"></i> Sprints</a>
                     </li>
                 </ul>
             </nav>
@@ -72,6 +69,7 @@
         </aside>
 
         <main class="main-content">
+            <!-- VISTA PROYECTOS -->
             <div id="view-proyectos" class="app-view active">
                 <div class="content-header flex-between">
                     <h2><i class="fa-regular fa-folder text-red"></i> Proyectos</h2>
@@ -79,17 +77,70 @@
                 </div>
                 <div id="projects-container" class="projects-grid"></div>
                 <button class="btn-text mt-2 btn-action-lider" onclick="openModal('modal-crear')">+ Crear Proyecto</button>
+
+                <!-- Panel de Detalles Expandido -->
+                <div id="project-details-panel" class="profile-card-container mt-2" style="display:none; background:white; padding:20px; border-radius:10px; border:1px solid #ddd;">
+                    <div class="flex-between" style="border-bottom: 2px solid #cc0000; padding-bottom:10px;">
+                        <h2 id="detail-project-name" class="text-red">Nombre del Proyecto</h2>
+                        <button class="btn-outline" onclick="document.getElementById('project-details-panel').style.display='none'">Cerrar Detalles</button>
+                    </div>
+                    
+                    <div style="display:flex; gap:20px; margin-top:20px; flex-wrap:wrap;">
+                        <div style="flex:1; min-width:250px;">
+                            <h3>Información General</h3>
+                            <p class="mt-1"><b>Estado Actual:</b> <span id="detail-project-status" class="badge red">Creado</span></p>
+                            <p class="mt-1"><b>Cambiar Estado del Proyecto:</b></p>
+                            <select id="change-project-status-select" class="status-select status-gray" style="margin-top:5px;" onchange="updateProjectStatusState()">
+                                <option value="Creado">Creado</option>
+                                <option value="Terminado">Terminado</option>
+                                <option value="Eliminado">Eliminado</option>
+                            </select>
+
+                            <h3 class="mt-2">Integrantes del Equipo</h3>
+                            <ul id="detail-members-list" style="margin-left:20px; margin-top:10px;"></ul>
+                            
+                            <div class="mt-1 btn-action-add-member">
+                                <input type="email" id="add-member-email" placeholder="Correo del integrante" class="input-box" style="display:inline-block; width:70%; margin-bottom:0;">
+                                <button class="btn-primary" onclick="addMemberToProject()" style="padding:9px 15px;">+</button>
+                            </div>
+                        </div>
+
+                        <div style="flex:1; min-width:250px;">
+                            <h3>Fotos de la Evolución</h3>
+                            <div id="detail-photos-container" style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;"></div>
+                            <div class="mt-1">
+                                <input type="text" id="project-photo-url" placeholder="URL de la imagen" class="input-box" style="display:inline-block; width:70%; margin-bottom:0;">
+                                <button class="btn-primary" onclick="uploadProjectPhoto()" style="padding:9px 15px;"><i class="fa-solid fa-upload"></i></button>
+                            </div>
+
+                            <h3 class="mt-2">Bitácora de Comentarios</h3>
+                            <div id="detail-comments-container" style="max-height:150px; overflow-y:auto; background:#f5f6fa; padding:10px; border-radius:5px; margin-top:10px;"></div>
+                            <div class="mt-1" style="display:flex; gap:5px;">
+                                <input type="text" id="project-comment-text" placeholder="Escribe una observación..." class="input-box" style="margin-bottom:0;">
+                                <button class="btn-primary" onclick="addProjectComment()">Enviar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
+            <!-- VISTA TAREAS -->
             <div id="view-tareas" class="app-view">
-                <div class="content-header">
+                <div class="content-header flex-between">
                     <h2><i class="fa-solid fa-check-square text-red"></i> Tareas</h2>
+                    <div>
+                        <label for="filter-task-project"><b>Filtrar por Proyecto: </b></label>
+                        <select id="filter-task-project" class="status-select status-gray" onchange="renderTasks()">
+                            <option value="all">Todos los proyectos</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table class="red-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Proyecto</th>
                                 <th>Nombre de la tarea</th>
                                 <th>Sprint</th>
                                 <th>Estado</th>
@@ -97,66 +148,35 @@
                                 <th>Responsable</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tasks-table-body"></tbody>
+                    </table>
+                </div>
+                <div class="mt-2">
+                    <button class="btn-primary" onclick="openModal('modal-crear-tarea')">+ Crear Nueva Tarea</button>
+                </div>
+            </div>
+
+            <!-- VISTA SPRINTS -->
+            <div id="view-sprints" class="app-view">
+                <div class="content-header">
+                    <h2><i class="fa-regular fa-calendar-days text-red"></i> Sprints del Semestre</h2>
+                </div>
+                <div class="table-container">
+                    <table class="red-table">
+                        <thead>
                             <tr>
-                                <td>1</td>
-                                <td>Diseño de la estructura del Robot</td>
-                                <td>Sprint 1</td>
-                                <td>
-                                    <select class="status-select status-gray" onchange="changeStatus(this)">
-                                        <option value="sin-empezar" selected>Sin empezar</option>
-                                        <option value="progreso">En progreso</option>
-                                        <option value="completada">Completada</option>
-                                    </select>
-                                </td>
-                                <td><span class="badge red">Alta</span></td>
-                                <td>Juan Arévalo</td>
+                                <th>Proyecto Asociado</th>
+                                <th>Bloque</th>
+                                <th>Rango de Fechas</th>
+                                <th>Estado</th>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Diseñar dashboard web</td>
-                                <td>Sprint 1</td>
-                                <td>
-                                    <select class="status-select status-yellow" onchange="changeStatus(this)">
-                                        <option value="sin-empezar">Sin empezar</option>
-                                        <option value="progreso" selected>En progreso</option>
-                                        <option value="completada">Completada</option>
-                                    </select>
-                                </td>
-                                <td><span class="badge gray">Media</span></td>
-                                <td>Breiner Bonilla</td>
-                            </tr>
-                        </tbody>
+                        </thead>
+                        <tbody id="sprints-table-body"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="view-sprints" class="app-view">
-                <div class="content-header">
-                    <h2><i class="fa-regular fa-calendar-days text-red"></i> Sprint</h2>
-                </div>
-                <table class="red-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Fechas</th>
-                            <th>Total tareas</th>
-                            <th>Completadas</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Sprint 1</td>
-                            <td>01/05/26 - 15/05/26</td>
-                            <td>10</td>
-                            <td>90%</td>
-                            <td>Actual</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
+            <!-- VISTA PERFIL -->
             <div id="view-perfil" class="app-view">
                 <div class="content-header">
                     <h2><i class="fa-regular fa-user-circle text-red"></i> Mi Perfil</h2>
@@ -183,20 +203,10 @@
                     </form>
                 </div>
             </div>
-
-            <div id="view-registrar" class="app-view">
-                <div class="content-header">
-                    <h2><i class="fa-solid fa-user-plus text-red"></i> Registrar Nuevo Usuario</h2>
-                </div>
-                <form class="register-form mt-2">
-                    <input type="text" placeholder="Nombre" class="input-line">
-                    <input type="email" placeholder="Correo institucional" class="input-line">
-                    <button type="button" class="btn-primary mt-2">Finalizar registro</button>
-                </form>
-            </div>
         </main>
     </div>
 
+    <!-- BANDEJA DE ENTRADA DRAWER -->
     <div id="notification-drawer" class="drawer">
         <div class="drawer-header">
             <div class="drawer-icons">
@@ -218,26 +228,32 @@
             <hr class="white-line">
             <div class="text-center mt-1"><small>Ayer</small></div>
             <div class="notification-item mt-1">
-                <p>Se modificó el estado de la tarea por un Administrator</p>
+                <p>Se modificó el estado de una tarea asignada</p>
                 <small>17/05/26 8:30am</small>
             </div>
         </div>
     </div>
     <div id="drawer-overlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
 
+    <!-- MODALES OVERLAY -->
     <div id="modal-overlay" class="modal-overlay">
         
+        <!-- CREAR PROYECTO -->
         <div id="modal-crear" class="modal-box text-center">
             <h3 class="text-red">Crear Proyecto</h3>
             <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Img" style="width:100px; margin:10px auto; border-radius:5px;">
-            <input type="text" id="new-project-name" placeholder="Nombre proyecto" class="input-box">
-            <input type="text" id="new-project-members" placeholder="Miembros" class="input-box">
+            <input type="text" id="new-project-name" placeholder="Nombre del proyecto" class="input-box">
+            <label style="display:block; text-align:left; font-size:0.85rem; font-weight:bold; margin-bottom:2px;">Fecha de Inicio Sprint 1:</label>
+            <input type="date" id="new-project-start" class="input-box">
+            <label style="display:block; text-align:left; font-size:0.85rem; font-weight:bold; margin-bottom:2px;">Fecha de Fin Sprint 2:</label>
+            <input type="date" id="new-project-end" class="input-box">
             <div class="mt-2 flex-center" style="gap:10px;">
                 <button class="btn-primary" onclick="createProject()">Guardar Proyecto</button>
                 <button class="btn-outline" onclick="closeModal()">Cancelar</button>
             </div>
         </div>
 
+        <!-- EDICIÓN -->
         <div id="modal-editar" class="modal-box text-center">
             <h3 class="text-red">Editar Proyecto</h3>
             <input type="hidden" id="edit-project-id">
@@ -248,12 +264,34 @@
             </div>
         </div>
 
+        <!-- ELIMINAR (ESTADO ELIMINADO) -->
         <div id="modal-eliminar" class="modal-box text-center">
             <h3 class="text-red">Eliminar Proyecto</h3>
-            <p style="margin: 15px 0;">¿Deseas eliminar este proyecto de manera permanente?</p>
+            <p style="margin: 15px 0;">¿Deseas cambiar el estado de este proyecto a Eliminado de forma permanente?</p>
             <input type="hidden" id="delete-project-id">
             <div class="mt-2 flex-center" style="gap:10px;">
-                <button class="btn-primary" onclick="confirmDeleteProject()">Eliminar</button>
+                <button class="btn-primary" onclick="confirmDeleteProject()">Confirmar</button>
+                <button class="btn-outline" onclick="closeModal()">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- CREAR TAREA -->
+        <div id="modal-crear-tarea" class="modal-box text-center">
+            <h3 class="text-red">Crear Nueva Tarea</h3>
+            <select id="task-project-select" class="input-box" style="margin-top:15px;"></select>
+            <input type="text" id="task-name" placeholder="Nombre de la tarea" class="input-box">
+            <select id="task-sprint-select" class="input-box">
+                <option value="Sprint 1">Sprint 1</option>
+                <option value="Sprint 2">Sprint 2</option>
+            </select>
+            <select id="task-priority-select" class="input-box">
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+            </select>
+            <input type="text" id="task-assignee" placeholder="Nombre del responsable" class="input-box">
+            <div class="mt-2 flex-center" style="gap:10px;">
+                <button class="btn-primary" onclick="createNewTaskData()">Crear Tarea</button>
                 <button class="btn-outline" onclick="closeModal()">Cancelar</button>
             </div>
         </div>
