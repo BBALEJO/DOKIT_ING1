@@ -3,37 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dock-it App</title>
+    <title>Dock-it App - Professional Academic Edition</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
+    <!-- VISTA DE LOGIN -->
     <div id="login-view" class="view-container active">
         <div class="login-wrapper">
             <h1 class="text-center text-red mt-2">Bienvenido a Dock-it</h1>
             <div class="login-content">
                 <div class="login-text-card">
                     <h3>¡Organiza tu equipo de investigación!</h3>
-                    <p>Inicia sesión con tus credenciales institucionales y comienza a gestionar tus proyectos.</p>
+                    <p>Inicia sesión con tus credenciales institucionales y gestiona tus proyectos científicos de forma ágil.</p>
                     <div class="test-credentials">
-                        <small><b>Prueba Líder:</b> lider@unilibre.edu.co / 123</small><br>
-                        <small><b>Prueba Profesor:</b> profe@unilibre.edu.co / 123</small><br>
-                        <small><b>Prueba Semillerista:</b> semi@unilibre.edu.co / 123</small>
+                        <small><b>Líder:</b> lider@unilibre.edu.co / 123</small><br>
+                        <small><b>Profesor:</b> profe@unilibre.edu.co / 123</small><br>
+                        <small><b>Semillerista:</b> semi@unilibre.edu.co / 123</small>
                     </div>
                 </div>
 
                 <form id="login-form" class="login-form">
                     <div class="form-group">
                         <label>Correo electrónico</label>
-                        <input type="email" id="login-email" required placeholder="lider@unilibre.edu.co">
+                        <input type="email" id="login-email" required placeholder="tu-correo@unilibre.edu.co">
                     </div>
                     <div class="form-group">
                         <label>Contraseña</label>
-                        <input type="password" id="login-pass" required placeholder="123">
+                        <input type="password" id="login-pass" required placeholder="•••••">
                     </div>
                     <p id="login-error" class="text-red text-small" style="display:none; margin-bottom:10px;">
-                        Credenciales incorrectas
+                        Credenciales incorrectas o usuario inexistente
                     </p>
                     <button type="submit" class="btn-primary">Iniciar sesión</button>
                 </form>
@@ -41,11 +42,15 @@
         </div>
     </div>
 
+    <!-- DASHBOARD PRINCIPAL -->
     <div id="dashboard-view" class="view-container">
         <aside class="sidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header text-center">
+                <div id="ui-avatar-container" class="mb-1">
+                    <img id="ui-user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&q=80" alt="Avatar" class="profile-avatar-mini">
+                </div>
                 <h3 id="ui-user-name">Usuario</h3>
-                <p id="ui-user-role">Rol</p>
+                <p id="ui-user-role" class="badge red">Rol</p>
             </div>
             <nav class="sidebar-nav">
                 <ul>
@@ -55,16 +60,24 @@
                     <li onclick="switchView('tareas', this)">
                         <a href="#"><i class="fa-solid fa-check-square"></i> Tareas</a>
                     </li>
-                    <li onclick="toggleDrawer()">
-                        <a href="#"><i class="fa-solid fa-inbox"></i> Bandeja de entrada</a>
-                    </li>
                     <li onclick="switchView('sprints', this)">
                         <a href="#"><i class="fa-regular fa-calendar-days"></i> Sprints</a>
+                    </li>
+                    <!-- Nueva pestaña exclusiva para el Líder -->
+                    <li id="nav-participantes" class="btn-action-lider" onclick="switchView('participantes', this)">
+                        <a href="#"><i class="fa-solid fa-users"></i> Participantes</a>
+                    </li>
+                    <!-- Nueva pestaña global -->
+                    <li onclick="switchView('basedatos', this)">
+                        <a href="#"><i class="fa-solid fa-database"></i> Base de Datos</a>
+                    </li>
+                    <li onclick="toggleDrawer()">
+                        <a href="#"><i class="fa-solid fa-inbox"></i> Bandeja de entrada</a>
                     </li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
-                <a href="#" onclick="switchView('perfil', this)"><i class="fa-regular fa-user-circle"></i> Perfil</a>
+                <a href="#" onclick="switchView('perfil', this)"><i class="fa-regular fa-user-circle"></i> Mi Perfil</a>
             </div>
         </aside>
 
@@ -72,51 +85,54 @@
             <!-- VISTA PROYECTOS -->
             <div id="view-proyectos" class="app-view active">
                 <div class="content-header flex-between">
-                    <h2><i class="fa-regular fa-folder text-red"></i> Proyectos</h2>
-                    <button class="btn-primary btn-action-lider" onclick="openModal('modal-crear')">Gestionar Proyectos</button>
+                    <h2><i class="fa-regular fa-folder text-red"></i> Proyectos de Investigación</h2>
+                    <button class="btn-primary btn-action-lider" onclick="openModal('modal-crear')">Crear Proyecto</button>
                 </div>
                 <div id="projects-container" class="projects-grid"></div>
-                <button class="btn-text mt-2 btn-action-lider" onclick="openModal('modal-crear')">+ Crear Proyecto</button>
 
                 <!-- Panel de Detalles Expandido -->
-                <div id="project-details-panel" class="profile-card-container mt-2" style="display:none; background:white; padding:20px; border-radius:10px; border:1px solid #ddd;">
+                <div id="project-details-panel" class="profile-card-container mt-2 animate-slide" style="display:none; background:white; padding:25px; border-radius:12px; border:1px solid #ddd; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
                     <div class="flex-between" style="border-bottom: 2px solid #cc0000; padding-bottom:10px;">
                         <h2 id="detail-project-name" class="text-red">Nombre del Proyecto</h2>
                         <button class="btn-outline" onclick="document.getElementById('project-details-panel').style.display='none'">Cerrar Detalles</button>
                     </div>
                     
-                    <div style="display:flex; gap:20px; margin-top:20px; flex-wrap:wrap;">
-                        <div style="flex:1; min-width:250px;">
+                    <div class="details-split-layout mt-2">
+                        <div class="details-left">
                             <h3>Información General</h3>
                             <p class="mt-1"><b>Estado Actual:</b> <span id="detail-project-status" class="badge red">Creado</span></p>
-                            <p class="mt-1"><b>Cambiar Estado del Proyecto:</b></p>
-                            <select id="change-project-status-select" class="status-select status-gray" style="margin-top:5px;" onchange="updateProjectStatusState()">
+                            
+                            <p class="mt-1"><b>Cambiar Estado:</b></p>
+                            <select id="change-project-status-select" class="status-select status-gray" style="margin-top:5px; padding: 8px 12px; width: 100%;" onchange="updateProjectStatusState()">
                                 <option value="Creado">Creado</option>
                                 <option value="Terminado">Terminado</option>
                                 <option value="Eliminado">Eliminado</option>
                             </select>
 
                             <h3 class="mt-2">Integrantes del Equipo</h3>
-                            <ul id="detail-members-list" style="margin-left:20px; margin-top:10px;"></ul>
+                            <ul id="detail-members-list" class="styled-list"></ul>
                             
                             <div class="mt-1 btn-action-add-member">
-                                <input type="email" id="add-member-email" placeholder="Correo del integrante" class="input-box" style="display:inline-block; width:70%; margin-bottom:0;">
-                                <button class="btn-primary" onclick="addMemberToProject()" style="padding:9px 15px;">+</button>
+                                <label class="text-small"><b>Asignar por Correo:</b></label>
+                                <div style="display:flex; gap:5px; margin-top:5px;">
+                                    <input type="email" id="add-member-email" placeholder="estudiante@unilibre.edu.co" class="input-box" style="margin-bottom:0;">
+                                    <button class="btn-primary" onclick="addMemberToProject()">+</button>
+                                </div>
                             </div>
                         </div>
 
-                        <div style="flex:1; min-width:250px;">
+                        <div class="details-right">
                             <h3>Fotos de la Evolución</h3>
-                            <div id="detail-photos-container" style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;"></div>
-                            <div class="mt-1">
-                                <input type="text" id="project-photo-url" placeholder="URL de la imagen" class="input-box" style="display:inline-block; width:70%; margin-bottom:0;">
-                                <button class="btn-primary" onclick="uploadProjectPhoto()" style="padding:9px 15px;"><i class="fa-solid fa-upload"></i></button>
+                            <div id="detail-photos-container" class="evolution-photos-grid"></div>
+                            <div class="mt-1" style="display:flex; gap:5px;">
+                                <input type="text" id="project-photo-url" placeholder="URL de la imagen del avance" class="input-box" style="margin-bottom:0;">
+                                <button class="btn-primary" onclick="uploadProjectPhoto()"><i class="fa-solid fa-upload"></i></button>
                             </div>
 
-                            <h3 class="mt-2">Bitácora de Comentarios</h3>
-                            <div id="detail-comments-container" style="max-height:150px; overflow-y:auto; background:#f5f6fa; padding:10px; border-radius:5px; margin-top:10px;"></div>
+                            <h3 class="mt-2">Bitácora de Observaciones</h3>
+                            <div id="detail-comments-container" class="comments-log-box"></div>
                             <div class="mt-1" style="display:flex; gap:5px;">
-                                <input type="text" id="project-comment-text" placeholder="Escribe una observación..." class="input-box" style="margin-bottom:0;">
+                                <input type="text" id="project-comment-text" placeholder="Escribe un comentario técnico..." class="input-box" style="margin-bottom:0;">
                                 <button class="btn-primary" onclick="addProjectComment()">Enviar</button>
                             </div>
                         </div>
@@ -127,9 +143,9 @@
             <!-- VISTA TAREAS -->
             <div id="view-tareas" class="app-view">
                 <div class="content-header flex-between">
-                    <h2><i class="fa-solid fa-check-square text-red"></i> Tareas</h2>
+                    <h2><i class="fa-solid fa-check-square text-red"></i> Gestión de Tareas</h2>
                     <div>
-                        <label for="filter-task-project"><b>Filtrar por Proyecto: </b></label>
+                        <label for="filter-task-project"><b>Filtrar: </b></label>
                         <select id="filter-task-project" class="status-select status-gray" onchange="renderTasks()">
                             <option value="all">Todos los proyectos</option>
                         </select>
@@ -141,7 +157,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Proyecto</th>
-                                <th>Nombre de la tarea</th>
+                                <th>Tarea</th>
                                 <th>Sprint</th>
                                 <th>Estado</th>
                                 <th>Prioridad</th>
@@ -159,7 +175,7 @@
             <!-- VISTA SPRINTS -->
             <div id="view-sprints" class="app-view">
                 <div class="content-header">
-                    <h2><i class="fa-regular fa-calendar-days text-red"></i> Sprints del Semestre</h2>
+                    <h2><i class="fa-regular fa-calendar-days text-red"></i> Ciclos Académicos (Sprints)</h2>
                 </div>
                 <div class="table-container">
                     <table class="red-table">
@@ -167,7 +183,7 @@
                             <tr>
                                 <th>Proyecto Asociado</th>
                                 <th>Bloque</th>
-                                <th>Rango de Fechas</th>
+                                <th>Rango de Fechas de Control</th>
                                 <th>Estado</th>
                             </tr>
                         </thead>
@@ -176,29 +192,68 @@
                 </div>
             </div>
 
-            <!-- VISTA PERFIL -->
+            <!-- VISTA PARTICIPANTES (NUEVA: SOLO LÍDER) -->
+            <div id="view-participantes" class="app-view">
+                <div class="content-header flex-between">
+                    <h2><i class="fa-solid fa-users text-red"></i> Control de Usuarios del Sistema</h2>
+                    <button class="btn-primary" onclick="openModal('modal-crear-usuario')">+ Crear Nuevo Usuario</button>
+                </div>
+                <div class="table-container">
+                    <table class="red-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre Completo</th>
+                                <th>Correo Institucional</th>
+                                <th>Rol Académico</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VISTA BASE DE DATOS Y LÍNEA DE TIEMPO (NUEVA) -->
+            <div id="view-basedatos" class="app-view">
+                <div class="content-header">
+                    <h2><i class="fa-solid fa-database text-red"></i> Trazabilidad e Historial Estructural (Base de Datos)</h2>
+                    <p class="text-small">Auditoría automática de cambios de estado, adición de archivos multimedia y evoluciones del sistema.</p>
+                </div>
+                
+                <div class="timeline mt-2" id="timeline-container">
+                    <!-- Los hitos se generan automáticamente -->
+                </div>
+            </div>
+
+            <!-- VISTA PERFIL AVANZADO -->
             <div id="view-perfil" class="app-view">
                 <div class="content-header">
-                    <h2><i class="fa-regular fa-user-circle text-red"></i> Mi Perfil</h2>
+                    <h2><i class="fa-regular fa-user-circle text-red"></i> Configuraciones de Mi Perfil Diario</h2>
                 </div>
-                <div class="profile-card-container mt-2">
-                    <form id="profile-form" class="profile-form">
+                <div class="profile-layout mt-2">
+                    <div class="profile-avatar-card text-center">
+                        <img id="profile-current-img" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="large-profile-avatar">
+                        <div class="mt-1">
+                            <label class="text-small"><b>URL de la Foto de Perfil:</b></label>
+                            <input type="text" id="profile-avatar-url" placeholder="https://url-de-la-foto.jpg" class="input-box mt-1">
+                        </div>
+                    </div>
+
+                    <form id="profile-form" class="profile-form-advanced">
                         <div class="form-group">
                             <label>Nombre Completo</label>
                             <input type="text" id="profile-name" required class="input-box">
                         </div>
                         <div class="form-group">
-                            <label>Correo Institucional</label>
-                            <input type="email" id="profile-email" required class="input-box" readonly style="background: #e9ecef; cursor: not-allowed;">
-                            <small class="text-small">El correo institucional no puede modificarse.</small>
+                            <label>Correo Electrónico Colectivo / Institucional</label>
+                            <input type="email" id="profile-email" readonly class="input-box uneditable-input">
                         </div>
                         <div class="form-group">
-                            <label>Nueva Contraseña</label>
-                            <input type="password" id="profile-pass" required class="input-box" placeholder="Ingresa tu nueva contraseña">
+                            <label>Contraseña del Sistema</label>
+                            <input type="password" id="profile-pass" required class="input-box">
                         </div>
                         <div class="flex-center mt-2" style="gap: 15px; justify-content: flex-start;">
-                            <button type="submit" class="btn-primary">Guardar Cambios</button>
-                            <button type="button" class="btn-outline" id="btn-logout">Cerrar sesión</button>
+                            <button type="submit" class="btn-primary">Actualizar Datos</button>
+                            <button type="button" class="btn-outline" id="btn-logout">Cerrar Sesión</button>
                         </div>
                     </form>
                 </div>
@@ -206,80 +261,70 @@
         </main>
     </div>
 
-    <!-- BANDEJA DE ENTRADA DRAWER -->
+    <!-- NOTIFICATION INBOX DRAWER -->
     <div id="notification-drawer" class="drawer">
         <div class="drawer-header">
             <div class="drawer-icons">
                 <i class="fa-regular fa-folder"></i>
-                <i class="fa-solid fa-check-square"></i>
-                <i class="fa-solid fa-image"></i>
-                <i class="fa-regular fa-calendar-days"></i>
+                <i class="fa-solid fa-database"></i>
+                <i class="fa-solid fa-users"></i>
             </div>
-            <button class="btn-icon text-white" onclick="toggleDrawer()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+            <button class="btn-icon text-white" onclick="toggleDrawer()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <hr class="white-line">
         <div class="drawer-content">
             <div class="notification-item">
-                <p>Fuiste agregado al proyecto "Robot Humanoide"</p>
-                <small>18/05/26 6:15pm</small>
-            </div>
-            <hr class="white-line">
-            <div class="text-center mt-1"><small>Ayer</small></div>
-            <div class="notification-item mt-1">
-                <p>Se modificó el estado de una tarea asignada</p>
-                <small>17/05/26 8:30am</small>
+                <p>Auditoría de base de datos activa.</p>
+                <small>Sistema Operativo Inicializado</small>
             </div>
         </div>
     </div>
     <div id="drawer-overlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
 
-    <!-- MODALES OVERLAY -->
+    <!-- CAPA DE MODALES COMPLEMENTARIOS -->
     <div id="modal-overlay" class="modal-overlay">
         
-        <!-- CREAR PROYECTO -->
+        <!-- PROYECTO NUEVO -->
         <div id="modal-crear" class="modal-box text-center">
-            <h3 class="text-red">Crear Proyecto</h3>
-            <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Img" style="width:100px; margin:10px auto; border-radius:5px;">
-            <input type="text" id="new-project-name" placeholder="Nombre del proyecto" class="input-box">
-            <label style="display:block; text-align:left; font-size:0.85rem; font-weight:bold; margin-bottom:2px;">Fecha de Inicio Sprint 1:</label>
+            <h3 class="text-red">Crear Nuevo Proyecto</h3>
+            <input type="text" id="new-project-name" placeholder="Nombre del proyecto" class="input-box" style="margin-top:15px;">
+            <label class="modal-field-label">Fecha Inicio de Ciclo:</label>
             <input type="date" id="new-project-start" class="input-box">
-            <label style="display:block; text-align:left; font-size:0.85rem; font-weight:bold; margin-bottom:2px;">Fecha de Fin Sprint 2:</label>
+            <label class="modal-field-label">Fecha Finalización:</label>
             <input type="date" id="new-project-end" class="input-box">
             <div class="mt-2 flex-center" style="gap:10px;">
-                <button class="btn-primary" onclick="createProject()">Guardar Proyecto</button>
+                <button class="btn-primary" onclick="createProject()">Inicializar</button>
                 <button class="btn-outline" onclick="closeModal()">Cancelar</button>
             </div>
         </div>
 
-        <!-- EDICIÓN -->
+        <!-- EDITAR PROYECTO -->
         <div id="modal-editar" class="modal-box text-center">
-            <h3 class="text-red">Editar Proyecto</h3>
+            <h3 class="text-red">Modificar Nombre Estructural</h3>
             <input type="hidden" id="edit-project-id">
-            <input type="text" id="edit-project-name" placeholder="Nombre del proyecto" class="input-box" style="margin-top:15px;">
+            <input type="text" id="edit-project-name" class="input-box" style="margin-top:15px;">
             <div class="mt-2 flex-center" style="gap:10px;">
-                <button class="btn-primary" onclick="saveEditProject()">Guardar Cambios</button>
+                <button class="btn-primary" onclick="saveEditProject()">Guardar</button>
                 <button class="btn-outline" onclick="closeModal()">Cancelar</button>
             </div>
         </div>
 
-        <!-- ELIMINAR (ESTADO ELIMINADO) -->
+        <!-- CONFIRMAR ELIMINACIÓN -->
         <div id="modal-eliminar" class="modal-box text-center">
-            <h3 class="text-red">Eliminar Proyecto</h3>
-            <p style="margin: 15px 0;">¿Deseas cambiar el estado de este proyecto a Eliminado de forma permanente?</p>
+            <h3 class="text-red">¿Cambiar estado a Eliminado?</h3>
+            <p style="margin:15px 0;" class="text-small">El elemento pasará al estado de archivado lógico dentro de la base de datos.</p>
             <input type="hidden" id="delete-project-id">
             <div class="mt-2 flex-center" style="gap:10px;">
-                <button class="btn-primary" onclick="confirmDeleteProject()">Confirmar</button>
+                <button class="btn-primary" onclick="confirmDeleteProject()">Aceptar</button>
                 <button class="btn-outline" onclick="closeModal()">Cancelar</button>
             </div>
         </div>
 
-        <!-- CREAR TAREA -->
+        <!-- TAREA NUEVA -->
         <div id="modal-crear-tarea" class="modal-box text-center">
-            <h3 class="text-red">Crear Nueva Tarea</h3>
+            <h3 class="text-red">Crear Asignación Directa</h3>
             <select id="task-project-select" class="input-box" style="margin-top:15px;"></select>
-            <input type="text" id="task-name" placeholder="Nombre de la tarea" class="input-box">
+            <input type="text" id="task-name" placeholder="Enunciado descriptivo de la tarea" class="input-box">
             <select id="task-sprint-select" class="input-box">
                 <option value="Sprint 1">Sprint 1</option>
                 <option value="Sprint 2">Sprint 2</option>
@@ -289,27 +334,32 @@
                 <option value="Media">Media</option>
                 <option value="Baja">Baja</option>
             </select>
-            <input type="text" id="task-assignee" placeholder="Nombre del responsable" class="input-box">
+            <input type="text" id="task-assignee" placeholder="Nombre completo del ejecutor" class="input-box">
             <div class="mt-2 flex-center" style="gap:10px;">
-                <button class="btn-primary" onclick="createNewTaskData()">Crear Tarea</button>
+                <button class="btn-primary" onclick="createNewTaskData()">Crear</button>
+                <button class="btn-outline" onclick="closeModal()">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- NUEVO USUARIO (MODAL NUEVO) -->
+        <div id="modal-crear-usuario" class="modal-box text-center">
+            <h3 class="text-red">Registrar Participante en Base de Datos</h3>
+            <input type="text" id="user-new-name" placeholder="Nombre Completo" class="input-box" style="margin-top:15px;">
+            <input type="email" id="user-new-email" placeholder="correo@unilibre.edu.co" class="input-box">
+            <input type="password" id="user-new-pass" placeholder="Contraseña Inicial" class="input-box">
+            <select id="user-new-role" class="input-box">
+                <option value="Semillerista">Semillerista</option>
+                <option value="Profesor">Profesor</option>
+                <option value="Lider">Lider</option>
+            </select>
+            <div class="mt-2 flex-center" style="gap:10px;">
+                <button class="btn-primary" onclick="createNewUserByLider()">Registrar e Insertar</button>
                 <button class="btn-outline" onclick="closeModal()">Cancelar</button>
             </div>
         </div>
 
     </div>
 
-    <script>
-        function changeStatus(select){
-            select.classList.remove("status-gray", "status-yellow", "status-green");
-            if(select.value === "sin-empezar"){
-                select.classList.add("status-gray");
-            }else if(select.value === "progreso"){
-                select.classList.add("status-yellow");
-            }else if(select.value === "completada"){
-                select.classList.add("status-green");
-            }
-        }
-    </script>
     <script src="app.js"></script>
 </body>
 </html>
