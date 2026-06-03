@@ -2,6 +2,7 @@ let currentSelectedProjectId = null;
 
 // ==================== BASE DE DATOS ESTRUCTURAL INICIAL ====================
 function initDB() {
+    // REPARADO: Volvieron los usuarios de prueba con sus roles correspondientes
     if (!localStorage.getItem('users')) {
         const defaultUsers = [
             { email: 'lider@unilibre.edu.co', pass: '123', role: 'Lider', name: 'Prof. Lider Principal', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80' },
@@ -34,7 +35,6 @@ function initDB() {
         localStorage.setItem('tasks', JSON.stringify(defaultTasks));
     }
 
-    // Estructura automatizada para la línea de tiempo e historial global
     if (!localStorage.getItem('timelineLogs')) {
         const defaultLogs = [
             {
@@ -61,11 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault(); 
-            const email = document.getElementById('login-email').value;
+            const email = document.getElementById('login-email').value.trim();
             const pass = document.getElementById('login-pass').value;
             
-            const users = JSON.parse(localStorage.getItem('users'));
-            const user = users.find(u => u.email === email && u.pass === pass);
+            // CORREGIDO: Ahora busca dinámicamente en el localStorage actualizado (acepta nuevos usuarios)
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.pass === pass);
 
             if (user) {
                 localStorage.setItem('currentUser', JSON.stringify(user));
@@ -148,7 +149,7 @@ function pushTimelineLog(projName, action, desc, img) {
         timestamp: now.toLocaleString('es-CO')
     };
     
-    logs.unshift(newLog); // Añadir al inicio para orden cronológico inverso
+    logs.unshift(newLog);
     localStorage.setItem('timelineLogs', JSON.stringify(logs));
     renderTimeline();
 }
@@ -173,7 +174,7 @@ function renderTimeline() {
                     <span class="text-small" style="float:right; font-weight:bold; color:#777;">${log.timestamp}</span>
                     <h4>${log.projectName}</h4>
                     <p style="margin-top:5px; font-size:0.9rem;"><b>Acción:</b> ${log.actionType}</p>
-                    <p class="text-gray style="font-size:0.85rem; margin-top:3px;">${log.description}</p>
+                    <p class="text-gray" style="font-size:0.85rem; margin-top:3px;">${log.description}</p>
                     ${imgHtml}
                 </div>
             </div>
@@ -246,8 +247,8 @@ function renderUsersTable() {
 }
 
 function createNewUserByLider() {
-    const name = document.getElementById('user-new-name').value;
-    const email = document.getElementById('user-new-email').value;
+    const name = document.getElementById('user-new-name').value.trim();
+    const email = document.getElementById('user-new-email').value.trim();
     const pass = document.getElementById('user-new-pass').value;
     const role = document.getElementById('user-new-role').value;
 
@@ -259,23 +260,28 @@ function createNewUserByLider() {
         return alert("Error: El correo electrónico ya se encuentra registrado.");
     }
 
+    // Inserción limpia en base de datos local
     users.push({
         name: name,
         email: email,
         pass: pass,
         role: role,
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80' // Avatar genérico inicial
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'
     });
 
     localStorage.setItem('users', JSON.stringify(users));
     
+    // Resetear formulario interno
     document.getElementById('user-new-name').value = '';
     document.getElementById('user-new-email').value = '';
     document.getElementById('user-new-pass').value = '';
 
     closeModal();
-    renderUsersTable();
-    alert(`Usuario ${name} insertado de forma exitosa.`);
+    
+    // CORREGIDO: Forzar recarga completa de todos los componentes visuales del sistema
+    dashboardStartup();
+    
+    alert(`Usuario "${name}" registrado con éxito. Ya puede iniciar sesión con este correo.`);
 }
 
 // ==================== INTERRUPTOR DE VISTAS ====================
@@ -359,7 +365,6 @@ function createProject() {
     
     localStorage.setItem('projects', JSON.stringify(projects));
     
-    // Generar Hito Automático en Base de Datos
     pushTimelineLog(nameInput, 'Inicialización de Proyecto', `El Líder del semillero creó el proyecto fijando fechas de control: ${startInput} hasta ${endInput}.`, '');
 
     document.getElementById('new-project-name').value = '';
@@ -471,7 +476,6 @@ function updateProjectStatusState() {
     projects = projects.map(p => p.id === currentSelectedProjectId ? { ...p, status: selectedState } : p);
     localStorage.setItem('projects', JSON.stringify(projects));
     
-    // Almacenamiento automático en base de datos
     pushTimelineLog(proj.name, 'Transición de Estado del Ciclo', `Se alteró manualmente el estado interno del proyecto hacia: "${selectedState}".`, '');
 
     renderProjects();
@@ -522,7 +526,6 @@ function uploadProjectPhoto() {
 
     localStorage.setItem('projects', JSON.stringify(projects));
     
-    // Guardado en la base de datos de la línea de tiempo junto con la imagen cargada
     pushTimelineLog(targetProj.name, 'Carga de Evidencia Multimedia', 'Se subió una nueva fotografía representativa al diario de evolución tecnológica del proyecto.', url);
 
     document.getElementById('project-photo-url').value = '';
